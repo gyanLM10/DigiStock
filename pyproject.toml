@@ -1,0 +1,23 @@
+[project]
+name = "DigiAlgo"
+version = "0.1.0"
+description = "An MCP powered Multi agent trading bot"
+authors = [
+  { name = "Gyankrit Bhuyan", email = "gyankbhuyan@gmail.com" }
+]
+readme = "README.md"
+requires-python = ">=3.10"
+
+dependencies = [
+    "python-dotenv",
+    "langchain",
+    "langgraph",
+    "langchain-openai",
+    "langchain-mcp-adapters",
+    "streamlit",
+    "langgraph-supervisor>=0.0.29",
+    "notebook>=7.4.5",
+]
+
+
+
