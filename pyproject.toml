@@ -15,8 +15,10 @@ dependencies = [
     "langchain-openai",
     "langchain-mcp-adapters",
     "streamlit",
+    "yfinance",
     "langgraph-supervisor>=0.0.29",
     "notebook>=7.4.5",
+    "fastapi>=0.116.1",
 ]
 
 

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Analysis Chatbot 📈</title>
+    <style>
+        :root {
+            --bg-color: #f7f8fa;
+            --container-bg: #ffffff;
+            --text-color: #333;
+            --border-color: #e0e4e8;
+            --accent-color: #007bff;
+            --accent-hover: #0056b3;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #chat-container {
+            width: 90%;
+            max-width: 800px;
+            height: 95vh;
+            background-color: var(--container-bg);
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        #chat-box {
+            flex-grow: 1;
+            padding: 25px;
+            overflow-y: auto;
+            border-bottom: 1px solid var(--border-color);
+        }
+        #chat-box pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+            font-size: 14px;
+            line-height: 1.7;
+            background-color: #fdfdfd;
+            padding: 1em;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        #input-area { display: flex; padding: 15px; }
+        #user-input {
+            flex-grow: 1; border: 1px solid var(--border-color); border-radius: 25px;
+            padding: 12px 18px; font-size: 16px; margin-right: 10px;
+            transition: box-shadow 0.2s;
+        }
+        #user-input:focus { outline: none; box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2); }
+        #send-btn {
+            background-color: var(--accent-color); color: white; border: none;
+            border-radius: 25px; padding: 12px 24px; font-size: 16px; font-weight: 500;
+            cursor: pointer; transition: background-color 0.2s;
+        }
+        #send-btn:hover { background-color: var(--accent-hover); }
+        #send-btn:disabled { background-color: #a0cfff; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<div id="chat-container">
+    <div id="chat-box">
+        <h4>Welcome!</h4>
+        <p>This is an AI-powered stock analysis assistant. Enter a query below to begin.</p>
+    </div>
+    <div id="input-area">
+        <input type="text" id="user-input" placeholder="e.g., Find promising NSE stocks for short-term trading" value="Give me good stock recommendation from NSE for short term trading">
+        <button id="send-btn">Send</button>
+    </div>
+</div>
+
+<script>
+    const chatBox = document.getElementById('chat-box');
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
+
+    sendBtn.addEventListener('click', sendMessage);
+    userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+
+    async function sendMessage() {
+        const query = userInput.value;
+        if (!query.trim()) return;
+
+        displayMessage(`<strong>👤 You:</strong> ${query}`);
+        userInput.value = '';
+        toggleInput(true);
+
+        const botResponseElem = createBotResponseElement();
+
+        try {
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query }),
+            });
+
+            if (!response.ok) throw new Error(`Server error: ${response.status}`);
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                botResponseElem.textContent += decoder.decode(value, { stream: true });
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        } catch (error) {
+            botResponseElem.textContent += `\n\n--- ⚠️ Error ---\nCould not fetch response from the server. Please check the console.`;
+            console.error('Fetch error:', error);
+        } finally {
+            toggleInput(false);
+        }
+    }
+
+    function displayMessage(html) {
+        const messageElem = document.createElement('div');
+        messageElem.innerHTML = html;
+        chatBox.appendChild(messageElem);
+    }
+
+    function createBotResponseElement() {
+        const container = document.createElement('div');
+        container.innerHTML = '<strong>🤖 AI Analyst:</strong>';
+        const pre = document.createElement('pre');
+        container.appendChild(pre);
+        chatBox.appendChild(container);
+        return pre;
+    }
+
+    function toggleInput(disabled) {
+        userInput.disabled = disabled;
+        sendBtn.disabled = disabled;
+        if (!disabled) userInput.focus();
+    }
+</script>
+
+</body>
+</html>
