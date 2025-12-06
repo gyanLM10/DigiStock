@@ -1,0 +1,15 @@
+{
+  "openai_api_key": "YOUR_API_KEY",
+  "mcp": {
+    "server_url": "https://your-mcp-server-url",
+    "api_key": "YOUR_MCP_KEY"
+  },
+  "backend": {
+    "host": "0.0.0.0",
+    "port": 8000,
+    "debug": true
+  },
+  "frontend": {
+    "allowed_origins": ["http://localhost:3000"]
+  }
+}
