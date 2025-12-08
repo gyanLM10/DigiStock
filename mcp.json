@@ -1,0 +1,7 @@
+{
+  "name": "digi-stock-mcp",
+  "version": "1.0.0",
+  "description": "Custom MCP Server for stock data, indicators, ML predictions, and backtesting.",
+  "entry_point": "python server.py",
+  "tools": ["get_data", "indicators", "predict", "backtest"]
+}

@@ -1,56 +1,184 @@
-Multi-Agent Stock Analysis Chatbot 📈
-This project is a real-time, streaming chatbot that uses a multi-agent AI system to provide detailed stock analysis for India's National Stock Exchange (NSE). Users can interact with a simple web interface, and the backend orchestrates a team of specialized AI agents to research and deliver structured stock recommendations.
+📈 Multi-Agent Stock Analysis Chatbot
 
-The system is built with FastAPI for the backend, LangGraph for multi-agent orchestration, and a vanilla HTML/CSS/JS frontend. It leverages the Multi-Server Command Protocol (MCP) to connect with Bright Data, enabling agents to access live, unrestricted web data.
+Real-time, ML-powered NSE Stock Research System
+
+This project is a real-time streaming AI chatbot that performs multi-agent financial research for India's NSE (National Stock Exchange). It uses LangGraph, FastAPI, custom MCP servers, and Bright Data tools to deliver:
+
+📊 Real-time market data
+
+📰 Latest news sentiment
+
+📉 Technical indicators
+
+🤖 Machine learning–based price predictions
+
+🧠 Structured Buy/Sell/Hold recommendations
+
+All results are coordinated in a powerful multi-agent workflow, producing a complete analyst report.
 
 ✨ Features
-Multi-Agent Workflow: A sophisticated "assembly line" of AI agents, each with a specialized role (finding stocks, fetching data, analyzing news, and creating a final recommendation).
+🧩 Multi-Agent Research Workflow
 
-Live Web Data via Bright Data & MCP: Utilizes the MultiServerMCPClient to connect with Bright Data's powerful web scraping tools. This gives agents unrestricted, real-time access to market data and news, bypassing common web blocks.
+A LangGraph-powered "assembly line" of agents:
 
-Real-Time Streaming: Responses are streamed token-by-token to the user interface, providing a dynamic and responsive experience.
+Stock_Finder → identifies promising NSE stocks
 
-Structured Output: The final output is a well-formatted and easy-to-read analyst note, perfect for quick decision-making.
+Market_Data_Analyst → gathers live data (price, trends, indicators)
 
-Modern Tech Stack: Built with FastAPI, LangGraph, LangChain, and OpenAI's GPT-4 Turbo.
+News_Analyst → extracts sentiment from recent headlines
+
+Trading_Advisor → generates final recommendation
+
+🌐 Live Web Data via Bright Data MCP
+
+The system connects to Bright Data's Web Unlocker / Scraping Browser through:
+
+MultiServerMCPClient
+
+Fully MCP-compliant tool interface
+
+This enables real-time market data scraping, bypassing site restrictions.
+
+⚙️ Custom Stock MCP Server (New!)
+
+A dedicated MCP server provides:
+
+Historical market data
+
+Technical indicators (RSI, MACD, SMA/EMA)
+
+ML-powered price predictions (XGBoost)
+
+Strategy backtesting (SMA crossover)
+
+Tools available:
+get_data
+indicators
+predict
+backtest
+
+🤖 Machine Learning Prediction Engine
+
+A trained XGBoost model forecasts future stock prices using:
+
+Close
+
+Volume
+
+RSI
+
+SMA-50 / SMA-200
+
+EMA-20
+
+MACD
+
+The ML model and scaler are stored as:
+models/xgb_model.json
+models/scaler.pkl
+
+⚡ Real-Time Streaming
+
+Responses stream token-by-token to the web UI using FastAPI’s StreamingResponse.
+
+🖥️ Simple Frontend UI
+
+A clean HTML/CSS/JS interface for chatting with the AI system.
+
+🧱 Modern Tech Stack
+
+FastAPI (backend)
+
+LangGraph (agent orchestration)
+
+LangChain (tool + LLM abstraction)
+
+OpenAI GPT-4 Turbo
+
+Bright Data MCP tools
+
+Custom Stock MCP tools
+
+Vanilla JS frontend
 
 🏗️ System Architecture
-The application is composed of three main parts: a frontend, a backend, and the core agent logic.
+   
 
-1. Frontend (index.html)
-A clean, single-page web interface that allows users to send queries and receive streamed responses.
-
-Technology: Vanilla HTML, CSS, and JavaScript.
-
-Functionality: Captures user input, sends it to the backend's /chat endpoint, and dynamically displays the streamed response.
-
-2. Backend (backend.py)
-A FastAPI server that acts as the bridge between the frontend and the AI agent system.
-
-Technology: FastAPI.
-
-Endpoints:
-
-GET /: Serves the main index.html chat interface.
-
-POST /chat: The main endpoint that accepts a user query and returns a StreamingResponse by calling the agent logic.
-
-GET /health: A simple health check endpoint.
-
-3. Agent Logic (agent_logic.py)
-The core of the application, where the multi-agent system is defined and orchestrated using LangGraph.
-
-The Supervisor & Agents: A central supervisor manages a team of agents (Stock_Finder, Market_Data_Analyst, News_Analyst, Trading_Advisor) to execute the research workflow step-by-step.
-
-Tool Integration: Bright Data via MCP
-The agents' ability to access live web data is the most critical component of this system, enabled by:
-
-MultiServerMCPClient: This client from the langchain-mcp-adapters library implements the Multi-Server Command Protocol. It acts as a standardized bridge, allowing the LangGraph agents to seamlessly communicate with and command external tool servers.
-
-Bright Data: The external tool server in this architecture. It provides enterprise-grade web scraping capabilities, including the Web Unlocker and Scraping Browser. This is essential for accessing financial websites that might otherwise block automated requests, ensuring the data fed to the agents is timely and accurate.
+            ┌────────────────────────────┐
+               │        Frontend UI          │
+               │   (HTML / CSS / JS)         │
+               └─────────────┬──────────────┘
+                             │ HTTP (Stream)
+                             ▼
+               ┌────────────────────────────┐
+               │         FastAPI             │
+               │      (backend.py)           │
+               └─────────────┬──────────────┘
+                             │
+                             ▼
+               ┌────────────────────────────┐
+               │      Multi-Agent System     │
+               │     (agent_logic.py, LG)    │
+               ├────────────────────────────┤
+               │ Stock_Finder Agent          │
+               │ Market_Data_Analyst Agent   │
+               │ News_Analyst Agent          │
+               │ Trading_Advisor Agent       │
+               └─────────────┬──────────────┘
+      ┌──────────────────────┼────────────────────────┐
+      ▼                      ▼                        ▼
+┌───────────────┐   ┌─────────────────┐     ┌──────────────────────┐
+│ Bright Data    │   │ Custom Stock MCP│     │ OpenAI GPT-4 Turbo   │
+│ MCP Tools      │   │ (XGBoost, TA,   │     │ LLM Reasoning Engine │
+│ (Scraping)     │   │  Backtesting)   │     └──────────────────────┘
+└───────────────┘   └─────────────────┘
 
 
+📂 Project Structure
 
-All results are generated in multi_agent.ipynb
+├── frontend/
+│   └── index.html
+│
+├── backend/
+│   └── backend.py
+│
+├── agent/
+│   └── agent_logic.py
+│
+├── multi_agent.ipynb       # Example notebook for dev/testing
+│
+├── digi_mcp/               # NEW — Custom Stock MCP Server
+│   ├── server.py
+│   ├── mcp.json
+│   ├── tools/
+│   │   ├── market_data.py
+│   │   ├── indicators.py
+│   │   ├── predictions.py
+│   │   ├── backtesting.py
+│   │   ├── utils.py
+│   └── models/
+│       ├── xgb_model.json
+│       ├── scaler.pkl
+│
+└── train_xgb_model.py      # NEW — ML Training Script
 
 
+🤖 Multi-Agent Workflow
+
+User Query → sent to /chat
+
+FastAPI streams to LangGraph
+
+Supervisor activates agents:
+
+Stock_Finder → chooses stocks
+
+Market_Data_Analyst → fetches market data
+
+News_Analyst → processes news
+
+Trading_Advisor → final recommendation
+
+Bright Data MCP + Custom Stock MCP provide tools
+
+Final structured report streams back to UI

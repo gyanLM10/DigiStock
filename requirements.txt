@@ -4,3 +4,6 @@ langgraph
 langchain-openai
 langchain-mcp-adapters
 streamlit
+fastmcp
+xgboost
+scikit-learn
