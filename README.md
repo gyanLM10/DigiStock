@@ -1,184 +1,238 @@
-📈 Multi-Agent Stock Analysis Chatbot
+# DigiStock 📈
 
-Real-time, ML-powered NSE Stock Research System
+An AI-powered NSE stock analysis tool driven by a **multi-agent pipeline**, exposed entirely through a **Go CLI** — no browser, no server, just your terminal.
 
-This project is a real-time streaming AI chatbot that performs multi-agent financial research for India's NSE (National Stock Exchange). It uses LangGraph, FastAPI, custom MCP servers, and Bright Data tools to deliver:
+The CLI orchestrates a team of specialized AI agents (Stock Finder → Market Data Analyst → News Analyst → Trading Advisor) that together produce structured, real-time **Buy/Sell/Hold** recommendations for Indian NSE stocks.
 
-📊 Real-time market data
+---
 
-📰 Latest news sentiment
+## Architecture
 
-📉 Technical indicators
+```
+digistock analyze "query"
+        │
+        ▼
+  Go CLI (cli/digistock)
+        │  spawns subprocess
+        ▼
+  runner.py  ──▶  agent_logic.py
+                       │
+              LangGraph Supervisor
+                       │
+        ┌──────────────┼──────────────┐
+        ▼              ▼              ▼              ▼
+  Stock_Finder  Market_Data  News_Analyst  Trading_Advisor
+        │              │              │              │
+        └──────────────┴──────────────┴──────────────┘
+                       │
+                  Bright Data MCP
+               (live NSE web data)
+```
 
-🤖 Machine learning–based price predictions
+**No web UI or HTTP server required.** The CLI talks directly to Python via subprocess.
 
-🧠 Structured Buy/Sell/Hold recommendations
+---
 
-All results are coordinated in a powerful multi-agent workflow, producing a complete analyst report.
+## Prerequisites
 
-✨ Features
-🧩 Multi-Agent Research Workflow
+| Requirement | Version |
+|---|---|
+| Go | ≥ 1.22 |
+| Python | ≥ 3.10 |
+| Node.js + npx | For Bright Data MCP |
+| `uv` (recommended) | Python package manager |
 
-A LangGraph-powered "assembly line" of agents:
+---
 
-Stock_Finder → identifies promising NSE stocks
+## Setup
 
-Market_Data_Analyst → gathers live data (price, trends, indicators)
+### 1. Clone the repo
 
-News_Analyst → extracts sentiment from recent headlines
+```bash
+git clone <repo-url>
+cd DigiStock
+```
 
-Trading_Advisor → generates final recommendation
+### 2. Install Python dependencies
 
-🌐 Live Web Data via Bright Data MCP
+```bash
+# Using uv (recommended)
+uv sync
 
-The system connects to Bright Data's Web Unlocker / Scraping Browser through:
+# Or with pip
+pip install -r requirements.txt
+```
 
-MultiServerMCPClient
+### 3. Create your `.env` file
 
-Fully MCP-compliant tool interface
+```bash
+cp .env.example .env   # or create it manually
+```
 
-This enables real-time market data scraping, bypassing site restrictions.
+Edit `.env` with your API keys:
 
-⚙️ Custom Stock MCP Server (New!)
+```env
+# Required
+OPENAI_API_KEY=sk-...
+BRIGHT_DATA_API_TOKEN=your_bright_data_token
 
-A dedicated MCP server provides:
+# Optional (these have defaults)
+WEB_UNLOCKER_ZONE=unblocker
+BROWSER_ZONE=scraping_browser
+```
 
-Historical market data
+> **Where to get keys:**
+> - `OPENAI_API_KEY` → [platform.openai.com](https://platform.openai.com/api-keys)
+> - `BRIGHT_DATA_API_TOKEN` → [brightdata.com](https://brightdata.com)
 
-Technical indicators (RSI, MACD, SMA/EMA)
+### 4. Build the CLI
 
-ML-powered price predictions (XGBoost)
+```bash
+cd cli
+go build -o digistock .
+```
 
-Strategy backtesting (SMA crossover)
+This produces the `digistock` binary inside `cli/`.
 
-Tools available:
-get_data
-indicators
-predict
-backtest
+### 5. (Optional) Add to PATH
 
-🤖 Machine Learning Prediction Engine
+```bash
+# Add to your ~/.zshrc or ~/.bashrc
+export PATH="$PATH:/path/to/DigiStock/cli"
 
-A trained XGBoost model forecasts future stock prices using:
+source ~/.zshrc
+```
 
-Close
+---
 
-Volume
+## Usage
 
-RSI
+### Check your environment
 
-SMA-50 / SMA-200
+Always run this first to confirm everything is configured correctly:
 
-EMA-20
+```bash
+./cli/digistock health
+```
 
-MACD
+Expected output when ready:
+```
+🔍 DigiStock Environment Check
+────────────────────────────────────────
+  ✔ Project root found
+  ✔ runner.py
+  ✔ agent_logic.py
+  ✔ Python interpreter           Python 3.x.x
+  ✔ .env file
+  ✔ OPENAI_API_KEY               set
+  ✔ BRIGHT_DATA_API_TOKEN        set
+────────────────────────────────────────
+✔ All checks passed — run: digistock analyze
+```
 
-The ML model and scaler are stored as:
-models/xgb_model.json
-models/scaler.pkl
+---
 
-⚡ Real-Time Streaming
+### Run a stock analysis
 
-Responses stream token-by-token to the web UI using FastAPI’s StreamingResponse.
+```bash
+# Default analysis (picks 2 NSE stocks automatically)
+./cli/digistock analyze
 
-🖥️ Simple Frontend UI
+# Ask a specific question
+./cli/digistock analyze "Should I buy RELIANCE or INFY today?"
+./cli/digistock analyze "What are the top momentum NSE stocks this week?"
+./cli/digistock analyze "Give me a short-term trade for tomorrow"
+```
 
-A clean HTML/CSS/JS interface for chatting with the AI system.
+The pipeline streams live output as each agent completes its step:
 
-🧱 Modern Tech Stack
+```
+╔══════════════════════════════════════════════════╗
+║          DigiStock Multi-Agent Analysis          ║
+╚══════════════════════════════════════════════════╝
 
-FastAPI (backend)
+📊 Query: Should I buy RELIANCE or INFY today?
 
-LangGraph (agent orchestration)
+⠋  Initialising agent pipeline...
+✔ Pipeline started — streaming output...
 
-LangChain (tool + LLM abstraction)
+--- 🧑‍💻 Calling Sub-Agent: Stock_Finder ---
+...
+--- 🧑‍💻 Calling Sub-Agent: Market_Data_Analyst ---
+...
+--- 🧑‍💻 Calling Sub-Agent: News_Analyst ---
+...
+--- 🧑‍💻 Calling Sub-Agent: Trading_Advisor ---
 
-OpenAI GPT-4 Turbo
+**RELIANCE (RELIANCE)**
+**Recommendation:** Buy
+**Target Price:** INR 1520
+**Reason:** Strong volume breakout with bullish MACD crossover...
+...
+✔ Analysis complete.
+```
 
-Bright Data MCP tools
+---
 
-Custom Stock MCP tools
+### Flags
 
-Vanilla JS frontend
+| Flag | Short | Default | Description |
+|---|---|---|---|
+| `--dir` | `-d` | auto-detected | Path to DigiStock project root |
+| `--help` | `-h` | — | Show help |
 
-🏗️ System Architecture
-   
+```bash
+# If the CLI can't auto-detect the project root
+./cli/digistock analyze --dir /path/to/DigiStock "your query"
+./cli/digistock health  --dir /path/to/DigiStock
+```
 
-            ┌────────────────────────────┐
-               │        Frontend UI          │
-               │   (HTML / CSS / JS)         │
-               └─────────────┬──────────────┘
-                             │ HTTP (Stream)
-                             ▼
-               ┌────────────────────────────┐
-               │         FastAPI             │
-               │      (backend.py)           │
-               └─────────────┬──────────────┘
-                             │
-                             ▼
-               ┌────────────────────────────┐
-               │      Multi-Agent System     │
-               │     (agent_logic.py, LG)    │
-               ├────────────────────────────┤
-               │ Stock_Finder Agent          │
-               │ Market_Data_Analyst Agent   │
-               │ News_Analyst Agent          │
-               │ Trading_Advisor Agent       │
-               └─────────────┬──────────────┘
-      ┌──────────────────────┼────────────────────────┐
-      ▼                      ▼                        ▼
-┌───────────────┐   ┌─────────────────┐     ┌──────────────────────┐
-│ Bright Data    │   │ Custom Stock MCP│     │ OpenAI GPT-4 Turbo   │
-│ MCP Tools      │   │ (XGBoost, TA,   │     │ LLM Reasoning Engine │
-│ (Scraping)     │   │  Backtesting)   │     └──────────────────────┘
-└───────────────┘   └─────────────────┘
+---
 
+## Project Structure
 
-📂 Project Structure
+```
+DigiStock/
+├── agent_logic.py     # Multi-agent pipeline (LangGraph)
+├── runner.py          # Python entry point called by the CLI
+├── backend.py         # (Legacy) FastAPI server — not needed for CLI
+├── index.html         # (Legacy) Web frontend — not needed for CLI
+├── pyproject.toml     # Python project config
+├── .env               # Your API keys (create this)
+└── cli/
+    ├── main.go
+    ├── go.mod
+    └── cmd/
+        ├── root.go    # Root command + --dir flag
+        ├── analyze.go # analyze subcommand
+        └── health.go  # health subcommand
+```
 
-├── frontend/
-│   └── index.html
-│
-├── backend/
-│   └── backend.py
-│
-├── agent/
-│   └── agent_logic.py
-│
-├── multi_agent.ipynb       # Example notebook for dev/testing
-│
-├── digi_mcp/               # NEW — Custom Stock MCP Server
-│   ├── server.py
-│   ├── mcp.json
-│   ├── tools/
-│   │   ├── market_data.py
-│   │   ├── indicators.py
-│   │   ├── predictions.py
-│   │   ├── backtesting.py
-│   │   ├── utils.py
-│   └── models/
-│       ├── xgb_model.json
-│       ├── scaler.pkl
-│
-└── train_xgb_model.py      # NEW — ML Training Script
+---
 
+## Agent Pipeline
 
-🤖 Multi-Agent Workflow
+| Agent | Role |
+|---|---|
+| **Stock_Finder** | Picks 2 actively traded NSE stocks based on momentum/news/volume |
+| **Market_Data_Analyst** | Fetches price, volume, RSI, MACD, moving averages for chosen stocks |
+| **News_Analyst** | Summarizes recent headlines and sentiment for each stock |
+| **Trading_Advisor** | Produces the final structured Buy/Sell/Hold recommendation |
 
-User Query → sent to /chat
+All agents use **Bright Data via MCP** to access live, unrestricted financial web data.
 
-FastAPI streams to LangGraph
+---
 
-Supervisor activates agents:
+## Troubleshooting
 
-Stock_Finder → chooses stocks
+**`zsh: command not found: digistock`**
+→ Either use the full path `./cli/digistock` or [add the `cli/` folder to your PATH](#5-optional-add-to-path).
 
-Market_Data_Analyst → fetches market data
+**`.env file NOT SET` in health check**
+→ Create a `.env` file in the project root with your API keys (see [Setup](#3-create-your-env-file)).
 
-News_Analyst → processes news
+**`Failed to start Python`**
+→ Make sure your Python virtualenv is active, or install dependencies with `uv sync`.
 
-Trading_Advisor → final recommendation
-
-Bright Data MCP + Custom Stock MCP provide tools
-
-Final structured report streams back to UI
+**Long wait before first output**
+→ The Bright Data MCP server (`npx @brightdata/mcp`) starts on the first run — this is normal. Subsequent steps stream faster.

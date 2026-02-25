@@ -1,2 +1,6 @@
 .venv/
 .env
+
+# Go build output
+cli/digistock
+cli/*.exe
