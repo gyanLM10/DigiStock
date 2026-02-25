@@ -37,7 +37,49 @@ digistock <command>
 
 ---
 
-## Setup
+## Docker
+
+No local Python or Go installation needed — run everything in a container.
+
+### Build the image
+
+```bash
+docker build -t digistock .
+```
+
+### Run the TUI (interactive)
+
+```bash
+docker run -it --env-file .env digistock
+```
+
+### Run a direct command
+
+```bash
+# No API key needed
+docker run --rm -it --env-file .env digistock indicators TCS
+docker run --rm -it --env-file .env digistock backtest TCS
+
+# Requires API keys in .env
+docker run --rm -it --env-file .env digistock analyze "Should I buy RELIANCE today?"
+```
+
+### Using docker compose
+
+```bash
+# Launch TUI
+docker compose up
+
+# Run a specific command
+docker compose run --rm digistock indicators TCS
+docker compose run --rm digistock health
+```
+
+> **Note:** The TUI requires `-it` (interactive + TTY). Streaming commands also need `-it` for live output.
+
+---
+
+## Manual Setup
 
 ### 1. Clone the repo
 

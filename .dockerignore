@@ -1,0 +1,39 @@
+# Git
+.git
+.gitignore
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+
+# Virtual environments (Docker creates its own)
+.venv/
+venv/
+env/
+
+# Environment files (injected at runtime)
+.env
+
+# Go build artifacts
+cli/digistock
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Notebooks
+*.ipynb
+.ipynb_checkpoints/
+
+# macOS
+.DS_Store
+
+# Antigravity / Gemini agent dirs
+.gemini/
+.agent/
