@@ -60,18 +60,23 @@ func runHealth(root string) error {
 	_, runnerErr := os.Stat(runnerPath)
 	check("runner.py", runnerPath, runnerErr == nil)
 
-	// 3. agent_logic.py
+	// 3. runner_tools.py
+	runnerToolsPath := filepath.Join(root, "runner_tools.py")
+	_, runnerToolsErr := os.Stat(runnerToolsPath)
+	check("runner_tools.py", runnerToolsPath, runnerToolsErr == nil)
+
+	// 4. agent_logic.py
 	agentPath := filepath.Join(root, "agent_logic.py")
 	_, agentErr := os.Stat(agentPath)
 	check("agent_logic.py", agentPath, agentErr == nil)
 
-	// 4. Python interpreter
+	// 5. Python interpreter
 	python := resolvePython(root)
 	out, err := exec.Command(python, "--version").CombinedOutput()
 	pythonVersion := strings.TrimSpace(string(out))
 	check("Python interpreter", pythonVersion, err == nil)
 
-	// 5. .env file
+	// 6. .env file
 	envPath := filepath.Join(root, ".env")
 	_, envErr := os.Stat(envPath)
 	check(".env file", envPath, envErr == nil)

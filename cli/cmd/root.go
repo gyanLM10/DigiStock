@@ -42,4 +42,7 @@ func init() {
 	)
 	rootCmd.AddCommand(analyzeCmd)
 	rootCmd.AddCommand(healthCmd)
+	rootCmd.AddCommand(indicatorsCmd)
+	rootCmd.AddCommand(predictCmd)
+	rootCmd.AddCommand(backtestCmd)
 }
