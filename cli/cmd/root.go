@@ -45,4 +45,5 @@ func init() {
 	rootCmd.AddCommand(indicatorsCmd)
 	rootCmd.AddCommand(predictCmd)
 	rootCmd.AddCommand(backtestCmd)
+	rootCmd.AddCommand(tuiCmd)
 }
